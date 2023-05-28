@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MinesWeeper</title>
+        <link rel="icon" type="image/icon" href="Resources/favicon.ico" />
+        <link rel="stylesheet" href="styles.css" />
+        <meta name="description" content="MinesWeeper with a twist?" />
+    </head>
+
+    <body>
+        <table style="margin: auto">
+            <tbody>
+                <tr>
+                    <td>
+                        <div id="game-container" style="width: 500px">
+                            <div>
+                                <span id="options-link" title="game options">Game</span>
+                                | <span id="display-link" title="size/position">Display</span> |
+                                <span id="controls-link" title="keyboard/mouse controls">Controls</span> |
+                                <span id="import-link" title="load exported game">Import</span> |
+                                <span id="export-link" title="same game to be impoorted">Export</span>
+                            </div>
+                            <div id="board" class="board" ondrag="return false;" ondragstart="return false;"></div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <script src="script.js"></script>
+    </body>
+</html>
