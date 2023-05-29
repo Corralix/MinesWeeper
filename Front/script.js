@@ -1,12 +1,32 @@
-let boardHeight = 4;
-let boardWidth = 5;
-let numberOfMines = 4;
+const neighbors = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+];
+let boardHeight = 9;
+let boardWidth = 9;
+let numberOfMines = 78;
 let board = [];
 let cleanArray = [];
 let cleanMatrix = [];
-let mines = [];
-let minesPlaced = 0;
+let firstClickMode = "standard"; // "unlucky" = can hit bomb on first cell | "standard" = can't hit bomb | "noguess" = will always first click cell with no adjacent bombs
 //let rabCount = 0;
+
+function coordToID(coord) {
+    return coord[0] * boardWidth + coord[1];
+}
+
+function IDToCoord(ID) {
+    // only useful if cleanArray is used instead of cleanMatrix
+    const x = Math.floor(ID / boardWidth);
+    const y = theID - x * boardWidth;
+    return [x, y];
+}
 
 function initializeBoard() {
     if (boardHeight > 1 && boardWidth > 1 && numberOfMines <= boardHeight * boardWidth - 2 && numberOfMines > 1) {
@@ -19,7 +39,6 @@ function initializeBoard() {
         document.getElementById("board").style.gridTemplateColumns = `repeat(${boardWidth}, 0fr)`;
         for (let i = 0; i < boardHeight; i++) {
             board[i] = [];
-            console.log(i);
             for (let j = 0; j < boardWidth; j++) {
                 let theID = i * boardWidth + j; // i = Math.floor(theID / boardWidth)    ,  j = theID - Math.floor(theID / boardWidth) * boardWidth
                 board[i][j] = {
@@ -39,49 +58,28 @@ function initializeBoard() {
 }
 
 function placeMines(firstClick) {
-    for (let id = 0; id < numberOfMines; id++) {
-        const randID = Math.floor(Math.random() * cleanMatrix.length);
-        mines = mines.concat(cleanMatrix.splice(randID, 1));
+    let mines = [];
+    if (firstClickMode === "standard") {
+        cleanMatrix.splice(coordToID(firstClick), 1);
+    }
+    /*
+    console.log(
+        cleanMatrix.findIndex((pair) => {
+            return pair[0] === pairToRemove[0] && pair[1] === pairToRemove[1];
+        })
+    );
+    */
+    for (let minesPlaced = 0; minesPlaced < numberOfMines; minesPlaced++) {
+        const randIndex = Math.floor(Math.random() * cleanMatrix.length);
+        mines = mines.concat(cleanMatrix.splice(randIndex, 1));
     }
 
     for (let mineCoord of mines) {
-        let x = mineCoord;
-        console.log(x, x[0], x[1]);
+        board[mineCoord[0]][mineCoord[1]].mine = true;
     }
-    //console.log("Leftover", cleanArray);
-    //console.log("MINES", mines);
-
-    /*
-    while (minesPlaced < numberOfMines) {
-        const row = Math.floor(Math.random() * boardWidth);
-        const col = Math.floor(Math.random() * boardHeight);
-
-        console.log(`Trying to place at ${row} , ${col}`);
-
-        if (!board[row][col].mine) {
-            if (Math.abs(row - firstClick.x) <= 1 && Math.abs(col - firstClick.y) <= 1) {
-            } else {
-                board[row][col].mine = true;
-                console.log("Placed");
-                minesPlaced++;
-            }
-        }
-    }
-    */
 }
 
 function countAdjacentMines(row, col) {
-    const neighbors = [
-        [-1, -1],
-        [-1, 0],
-        [-1, 1],
-        [0, -1],
-        [0, 1],
-        [1, -1],
-        [1, 0],
-        [1, 1],
-    ];
-
     for (let i = 0; i < neighbors.length; i++) {
         const [dx, dy] = neighbors[i];
         const newRow = row + dx;
@@ -152,16 +150,15 @@ function renderBoard() {
             cell.classList.add("cell"); //, "hidden");
 
             if (board[i][j].revealed) {
-                cell.innerText = `${board[i][j].show}`;
-                /*
-                console.log("revealed", i, j, board[i][j].count);
+                /*cell.innerText = `${board[i][j].show}`;*/
+
+                //console.log("revealed", i, j, board[i][j].count);
                 //cell.classList.remove("hidden");
                 if (board[i][j].mine) {
-                    cell.innerText = "X";
+                    cell.innerText = "_";
                 } else {
                     cell.innerText = board[i][j].count === 0 ? " " : board[i][j].count;
                 }
-                */
             }
 
             cell.addEventListener("click", () => {
@@ -184,7 +181,7 @@ function gameOver() {
     renderBoard();
 }
 
-let firstClick = { x: 5, y: 5 };
+let firstClick = [4, 4];
 
 function startGame(firstClick) {
     initializeBoard();
@@ -197,3 +194,8 @@ initializeBoard();
 placeMines(firstClick);
 countAdjacentMinesForAllCells();
 renderBoard();
+
+document.getElementById("startGame").addEventListener("mouseup", function () {
+    initializeBoard();
+    //console.log("clicked");
+});
