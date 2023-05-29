@@ -14,6 +14,7 @@ let numberOfMines = 5;
 let board = [];
 let cleanArray = [];
 let cleanMatrix = [];
+let revealedCellCount = 0;
 let firstClickMode = "standard"; // "unlucky" = can hit bomb on first cell | "standard" = can't hit bomb | "noguess" = will always first click cell with no adjacent bombs
 
 function coordToID(coord) {
@@ -132,11 +133,12 @@ function countAdjacentMinesForAllCells() {
 }
 
 function revealCell(row, col) {
+    revealedCellCount += 1;
+
     if (board[row][col].mine) {
         gameOver();
         return;
     }
-
     board[row][col].revealed = true;
     const cellElement = document.getElementById(`${row}_${col}`);
     cellElement.classList.remove("hidden");
@@ -160,6 +162,11 @@ function revealCell(row, col) {
             }
         }
     }
+    if (revealedCellCount >= boardHeight * boardWidth - numberOfMines) {
+        alert("WIN!");
+
+        revealedCellCount = 0;
+    }
 }
 
 function flagCell(row, col) {
@@ -175,7 +182,7 @@ function flagCell(row, col) {
 
 function gameOver() {
     alert("Game Over!");
-    initializeBoard();
+    revealedCellCount = 0;
 }
 
 function startGame(firstClick) {
