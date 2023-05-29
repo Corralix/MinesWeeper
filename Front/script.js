@@ -10,12 +10,11 @@ const neighbors = [
 ];
 let boardHeight = 9;
 let boardWidth = 9;
-let numberOfMines = 78;
+let numberOfMines = 5;
 let board = [];
 let cleanArray = [];
 let cleanMatrix = [];
 let firstClickMode = "standard"; // "unlucky" = can hit bomb on first cell | "standard" = can't hit bomb | "noguess" = will always first click cell with no adjacent bombs
-//let rabCount = 0;
 
 function coordToID(coord) {
     return coord[0] * boardWidth + coord[1];
@@ -30,6 +29,7 @@ function IDToCoord(ID) {
 
 function initializeBoard() {
     if (boardHeight > 1 && boardWidth > 1 && numberOfMines <= boardHeight * boardWidth - 2 && numberOfMines > 1) {
+        let isFirstClick = true;
         cleanArray = Array.from({ length: boardHeight * boardWidth }, (x, i) => i);
         cleanMatrix = Array.from({ length: boardHeight * boardWidth }, (x, i) => [
             Math.floor(i / boardWidth),
@@ -43,17 +43,47 @@ function initializeBoard() {
                 let theID = i * boardWidth + j; // i = Math.floor(theID / boardWidth)    ,  j = theID - Math.floor(theID / boardWidth) * boardWidth
                 board[i][j] = {
                     mine: false,
-                    revealed: true,
+                    revealed: false,
+                    flagged: false,
                     count: 0,
                     id: theID,
                     coord: `${i}, ${j}`,
-                    show: theID,
                 };
-                //rabCount += 1;
+            }
+        }
+
+        const boardContainer = document.querySelector(".board");
+        boardContainer.innerHTML = "";
+
+        for (let x = 0; x < boardHeight; x++) {
+            for (let y = 0; y < boardWidth; y++) {
+                const cell = document.createElement("div");
+                cell.id = `${x}_${y}`;
+                cell.classList.add("cell", "hidden");
+
+                cell.addEventListener("click", () => {
+                    if (isFirstClick) {
+                        placeMines([x, y]);
+                        countAdjacentMinesForAllCells();
+                        isFirstClick = false;
+                        revealCell(x, y);
+                    } else if (!board[x][y].revealed) {
+                        revealCell(x, y);
+                    }
+                });
+
+                cell.addEventListener("contextmenu", (e) => {
+                    e.preventDefault();
+                    if (!isFirstClick && !board[x][y].revealed) {
+                        flagCell(x, y);
+                    }
+                });
+
+                boardContainer.appendChild(cell);
             }
         }
     } else {
-        console.log("ERROR: Conditions are wrong");
+        console.error("Conditions are wrong");
     }
 }
 
@@ -108,19 +138,12 @@ function revealCell(row, col) {
     }
 
     board[row][col].revealed = true;
+    const cellElement = document.getElementById(`${row}_${col}`);
+    cellElement.classList.remove("hidden");
+    cellElement.innerText = board[row][col].count === 0 ? " " : board[row][col].count;
+    //cellElement.classList.add(revealed);
 
     if (board[row][col].count === 0) {
-        const neighbors = [
-            [-1, -1],
-            [-1, 0],
-            [-1, 1],
-            [0, -1],
-            [0, 1],
-            [1, -1],
-            [1, 0],
-            [1, 1],
-        ];
-
         for (let i = 0; i < neighbors.length; i++) {
             const [dx, dy] = neighbors[i];
             const newRow = row + dx;
@@ -139,63 +162,29 @@ function revealCell(row, col) {
     }
 }
 
-function renderBoard() {
-    const boardContainer = document.querySelector(".board");
-    boardContainer.innerHTML = "";
-
-    for (let i = 0; i < boardHeight; i++) {
-        for (let j = 0; j < boardWidth; j++) {
-            const cell = document.createElement("div");
-            cell.id = `${i}_${j}`;
-            cell.classList.add("cell"); //, "hidden");
-
-            if (board[i][j].revealed) {
-                /*cell.innerText = `${board[i][j].show}`;*/
-
-                //console.log("revealed", i, j, board[i][j].count);
-                //cell.classList.remove("hidden");
-                if (board[i][j].mine) {
-                    cell.innerText = "_";
-                } else {
-                    cell.innerText = board[i][j].count === 0 ? " " : board[i][j].count;
-                }
-            }
-
-            cell.addEventListener("click", () => {
-                if (!board[i][j].revealed) {
-                    revealCell(i, j);
-                    renderBoard();
-                }
-            });
-
-            boardContainer.appendChild(cell);
-        }
+function flagCell(row, col) {
+    const cellElement = document.getElementById(`${row}_${col}`);
+    if (board[row][col].flagged == false) {
+        board[row][col].flagged = true;
+        cellElement.classList.add("flagged");
+    } else {
+        cellElement.classList.remove("flagged");
+        board[row][col].flagged = false;
     }
 }
 
 function gameOver() {
     alert("Game Over!");
     initializeBoard();
-    placeMines();
-    countAdjacentMinesForAllCells();
-    renderBoard();
 }
-
-let firstClick = [4, 4];
 
 function startGame(firstClick) {
     initializeBoard();
-    placeMines(firstClick);
-    countAdjacentMinesForAllCells();
-    renderBoard();
 }
 
 initializeBoard();
-placeMines(firstClick);
-countAdjacentMinesForAllCells();
-renderBoard();
 
-document.getElementById("startGame").addEventListener("mouseup", function () {
+document.getElementById("startGame").addEventListener("click", function () {
     initializeBoard();
-    //console.log("clicked");
+    console.log("Started Game");
 });
