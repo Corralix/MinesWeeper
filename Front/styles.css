@@ -3,6 +3,9 @@ body {
 }
 .board {
     display: grid;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 .cell {
@@ -25,9 +28,25 @@ body {
 
 .hidden:hover {
     -webkit-filter: brightness(50%);
+    filter: brightness(50%);
+}
+
+.mine {
+    background-image: url("/Front/Resources/mine.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
 }
 
 .flagged {
-    background-color: rgb(185, 50, 50);
-    background-image: url(Resources/flag.png);
+    background-image: url("/Front/Resources/flag.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 70%;
+    position: relative;
+}
+
+.mistake {
+    background-color: rgba(199, 0, 0, 0.507);
 }
