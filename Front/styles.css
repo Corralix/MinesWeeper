@@ -1,11 +1,16 @@
 body {
     background-color: #6e6e6e;
 }
+/*
+#game-container {
+    width: 500px;
+}*/
+
 .board {
     display: grid;
+    user-select: none; /* Standard syntax */
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
-    user-select: none; /* Standard syntax */
 }
 
 .cell {

@@ -8,8 +8,8 @@ const neighbors = [
     [1, 0],
     [1, 1],
 ];
-let boardHeight = 9;
-let boardWidth = 9;
+let boardHeight = 10;
+let boardWidth = 10;
 let numberOfMines = 5;
 let board = [];
 //let cleanArray = [];
@@ -181,13 +181,13 @@ function revealCell(row, col) {
 
 function flagCell(row, col) {
     const cellElement = document.getElementById(`${row}_${col}`);
+
     if (board[row][col].flagged) {
         board[row][col].flagged = false;
         if (board[row][col].mine) {
             board[row][col].correctFlag = false;
         }
         flagsAsID.splice(flagsAsID.indexOf(coordToID([row, col])), 1);
-        console.log(flagsAsID);
         cellElement.classList.remove("flagged");
     } else {
         board[row][col].flagged = true;
@@ -195,7 +195,6 @@ function flagCell(row, col) {
             board[row][col].correctFlag = true;
         }
         flagsAsID.push(coordToID([row, col]));
-        console.log(flagsAsID);
         cellElement.classList.add("flagged");
     }
 }
@@ -203,15 +202,14 @@ function flagCell(row, col) {
 function didYouWin(win) {
     if (!isGameOver) {
         if (win) {
-            alert("WIN!");
             for (let mineCoord of mines) {
                 if (!board[mineCoord[0]][mineCoord[1]].flagged) {
                     const revealedMine = document.getElementById(`${mineCoord[0]}_${mineCoord[1]}`);
                     flagCell(mineCoord[0], mineCoord[1]);
                 }
             }
+            alert("WIN!");
         } else {
-            alert("Game Over!");
             for (let mineCoord of mines) {
                 if (!board[mineCoord[0]][mineCoord[1]].flagged) {
                     const revealedMine = document.getElementById(`${mineCoord[0]}_${mineCoord[1]}`);
@@ -226,6 +224,7 @@ function didYouWin(win) {
                     falseFlag.classList.add("mistake");
                 }
             }
+            alert("Game Over!");
         }
         isGameOver = true;
     }
